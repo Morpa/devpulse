@@ -1,0 +1,47 @@
+# docker-compose.yml — Local development environment.
+#
+# Two services:
+#   api  — Go backend, hot-reload via 'air' (optional) or plain go run
+#   web  — Astro dev server with Vite HMR
+#
+# Usage:
+#   docker compose up          # start both services
+#   docker compose up api      # start just the Go API
+#
+# Environment variables are picked up from the .env file in the root.
+
+services:
+  # ── Go API ────────────────────────────────────────────────────────────────
+  api:
+    image: golang:1.26-alpine
+    working_dir: /app
+    volumes:
+      - ./apps/api:/app # mount source for live edits
+      - go-cache:/root/go # persist module download cache
+    ports:
+      - "8080:8080"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - PORT=8080
+    command: go run ./cmd
+    restart: unless-stopped
+
+  # ── Astro frontend ────────────────────────────────────────────────────────
+  web:
+    image: node:24-alpine
+    working_dir: /app
+    volumes:
+      - ./apps/web:/app
+      - web-node-modules:/app/node_modules
+    ports:
+      - "4321:4321"
+    environment:
+      - VITE_API_URL=http://api:8080
+    command: sh -c "corepack enable && pnpm install --ignore-scripts && pnpm run dev"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  go-cache:
+  web-node-modules:

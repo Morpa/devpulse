@@ -1,0 +1,162 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap");
+
+/* ── Tema custom — paleta CRT terminal ───────────────────────────────────── */
+@theme {
+  /* Backgrounds */
+  --color-void: #080b0d;
+  --color-surface: #0d1117;
+  --color-panel: #161b22;
+  --color-border: #21262d;
+
+  /* Phosphor green — cor principal */
+  --color-phosphor-dim: #1a4a2e;
+  --color-phosphor-muted: #2ea043;
+  --color-phosphor-base: #3fb950;
+  --color-phosphor-bright: #56d364;
+  --color-phosphor-glow: #7ee787;
+
+  /* Amber — avisos */
+  --color-amber-dim: #4a3000;
+  --color-amber-muted: #d29922;
+  --color-amber-base: #e3b341;
+  --color-amber-bright: #f0c264;
+
+  /* Crimson — crítico */
+  --color-crimson-dim: #4a0d0d;
+  --color-crimson-muted: #da3633;
+  --color-crimson-base: #f85149;
+  --color-crimson-bright: #ff7b72;
+
+  /* Texto */
+  --color-ink-faint: #30363d;
+  --color-ink-dim: #484f58;
+  --color-ink-muted: #6e7681;
+  --color-ink-subtle: #8b949e;
+  --color-ink-base: #c9d1d9;
+  --color-ink-bright: #e6edf3;
+
+  /* Tipografia */
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+
+  /* Animações */
+  --animate-blink: blink 1.2s step-end infinite;
+  --animate-slide-up: slideUp 0.4s ease-out forwards;
+  --animate-count-up: countUp 0.6s ease-out forwards;
+  --animate-glow-pulse: glowPulse 2s ease-in-out infinite;
+  --animate-scanline: scanline 8s linear infinite;
+}
+
+/* ── Keyframes ───────────────────────────────────────────────────────────── */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 4px #3fb950;
+  }
+  50% {
+    box-shadow:
+      0 0 14px #56d364,
+      0 0 28px #3fb95055;
+  }
+}
+
+@keyframes scanline {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    font-family: var(--font-mono);
+    background-color: var(--color-void);
+    color: var(--color-ink-base);
+    scroll-behavior: smooth;
+  }
+
+  /* Scrollbar phosphor */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-surface);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-phosphor-muted);
+    border-radius: 3px;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-phosphor-muted) var(--color-surface);
+  }
+}
+
+/* ── Utilities custom ────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Efeito glow de texto phosphor */
+  .text-glow {
+    text-shadow: 0 0 8px rgba(63, 185, 80, 0.6);
+  }
+
+  /* Overlay de scanlines CRT — aplicar ao body */
+  .crt::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0, 0, 0, 0.07) 3px,
+      rgba(0, 0, 0, 0.07) 4px
+    );
+  }
+
+  /* Cursor piscante */
+  .cursor::after {
+    content: "█";
+    margin-left: 2px;
+    color: var(--color-phosphor-base);
+    animation: var(--animate-blink);
+  }
+}

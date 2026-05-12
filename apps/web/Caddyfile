@@ -1,0 +1,35 @@
+# Caddyfile — API reverse proxy + Static file server
+
+:80 {
+    # API — must be handled FIRST and SEPARATELY
+    handle /api/* {
+        reverse_proxy api:8080
+    }
+
+    # OPTIONS preflight for other routes (not needed for /api/*)
+    @options {
+        method OPTIONS
+    }
+    handle @options {
+        respond 204 {
+            close
+        }
+    }
+
+    # Static files (everything else)
+    handle {
+        root * /srv
+        file_server
+        try_files {path} /index.html
+
+        @versioned path /_astro/*
+        header @versioned Cache-Control "public, max-age=31536000, immutable"
+    }
+
+    # Global CORS headers
+    header /* {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type"
+    }
+}

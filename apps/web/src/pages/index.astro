@@ -1,0 +1,9 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Dashboard from "../components/Dashboard";
+---
+
+<Layout title="DevPulse — Repository Health Monitor">
+  <!-- Dashboard é um React island — hidrata no browser com client:load -->
+  <Dashboard client:load />
+</Layout>

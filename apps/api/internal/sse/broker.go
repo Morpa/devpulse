@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/Morpa/devpulse/api/internal/models"
 	"github.com/gin-gonic/gin"
@@ -93,6 +94,10 @@ func (b *Broker) Handler() gin.HandlerFunc {
 		b.register <- ch
 		defer func() { b.unregister <- ch }()
 
+		// Enviar comentário de keep-alive a cada 15 segundos
+		ticker := time.NewTicker(15 * time.Second)
+		defer ticker.Stop()
+
 		for {
 			select {
 			case msg, ok := <-ch:
@@ -101,6 +106,11 @@ func (b *Broker) Handler() gin.HandlerFunc {
 				}
 				// Formato SSE: "data: <json>\n\n"
 				fmt.Fprintf(c.Writer, "data: %s\n\n", msg)
+				flusher.Flush()
+
+			case <-ticker.C:
+				// Keep-alive ping — comentário SSE não é processado pelo cliente
+				fmt.Fprintf(c.Writer, ": heartbeat\n\n")
 				flusher.Flush()
 
 			case <-c.Request.Context().Done():
